@@ -19,8 +19,8 @@ if __name__ == "__main__":
 	device = torch.device("cuda:0")
 	print("global rank = " + str(rank))
 	print("device = " + torch.cuda.get_device_name(device))
-	tensor = torch.arange(2, device=device) + 1 + 2 * rank
+	tensor = torch.arange(1000, device=device) + 1 + 2 * rank
 	print(tensor)
 	dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
 	print(tensor)
-	#ddp_cleanup()
+	ddp_cleanup()
