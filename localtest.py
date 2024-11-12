@@ -22,5 +22,5 @@ if __name__ == "__main__":
 
     dev1 = torch.device("cuda:1")
     print("device = " + torch.cuda.get_device_name(dev1))
-    devSum(dev1)
+    vecSum(dev1)
 
