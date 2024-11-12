@@ -22,10 +22,10 @@ if __name__ == "__main__":
 	print("device = " + torch.cuda.get_device_name(device))
 
 	with torch.profiler.profile() as prof:
-		tensor = torch.ones(10, device=device)
+		tensor = torch.ones(10**6, device=device)
 		dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
 	
-	print(tensor)
+	print("Size in memory (Mb): " + str(tensor.element_size() * tensor.nelement() / 10**6))
 
 	print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
 
