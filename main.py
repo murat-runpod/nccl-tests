@@ -22,7 +22,7 @@ if __name__ == "__main__":
 	print("device = " + torch.cuda.get_device_name(device))
 
 	with torch.profiler.profile() as prof:
-		tensor = torch.ones(10)
+		tensor = torch.ones(10, device=device)
 		dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
 	
 	print(tensor)
