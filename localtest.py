@@ -11,7 +11,7 @@ def vecSum(device):
     print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
     a = None
     b = None
-
+    c = None
 
 
 if __name__ == "__main__":
