@@ -2,6 +2,7 @@ import os
 import torch
 import torch.distributed as dist
 from torch.distributed import all_reduce
+from torch.profiler import profile, record_function, ProfilerActivity
 
 from torch.nn.parallel import DistributedDataParallel as DDP
 
@@ -19,8 +20,16 @@ if __name__ == "__main__":
 	device = torch.device("cuda:0")
 	print("global rank = " + str(rank))
 	print("device = " + torch.cuda.get_device_name(device))
-	tensor = torch.arange(1000, device=device) + 1 + 2 * rank
+
+	with torch.profiler(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
+		tensor = torch.ones(10)
+		dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+	
 	print(tensor)
-	dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
-	print(tensor)
+
+	print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
+
+	#tensor = torch.arange(1000, device=device) + 1 + 2 * rank
+	#print(tensor)
+	#print(tensor)
 	ddp_cleanup()
