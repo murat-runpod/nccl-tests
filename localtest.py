@@ -3,9 +3,9 @@ from torch.profiler import profile, record_function, ProfilerActivity
 
 
 def vecSum(device):
-    print("Vector size (Mb): " + str(a.element_size() * a.nelement() / 10**6))
     a = torch.ones(10**9, device=device)
     b = torch.ones(10**9, device=device)
+    print("Vector size (Mb): " + str(a.element_size() * a.nelement() / 10**6))
     c = a + b
     a = None
     b = None
