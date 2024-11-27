@@ -4,9 +4,11 @@ export NCCL_DEBUG=INFO
 export NCCL_SOCKET_IFNAME=bond0.2636
 ./.torch/bin/torchrun \
     --nproc_per_node=1 \
+    --nccl_nsocks_perthread=4\
     --nnodes=2 \
     --node_rank=0 \
     --rdzv_id=687 \
     --rdzv_backend=static \
     --rdzv_endpoint=213.173.111.94:55000 \
    main.py
+   

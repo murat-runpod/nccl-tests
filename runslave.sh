@@ -4,6 +4,7 @@ export NCCL_DEBUG=INFO
 export NCCL_SOCKET_IFNAME=bond0.2636
 ./.torch/bin/torchrun \
     --nproc_per_node=1 \
+    --nccl_nsocks_perthread=4\
     --nnodes=2 \
     --node_rank=1 \
     --rdzv_id=687 \
