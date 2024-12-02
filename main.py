@@ -28,7 +28,6 @@ if __name__ == "__main__":
 	print("Size in memory (Mb): " + str(tensor.element_size() * tensor.nelement() / 10**6))
 
 	print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
-
 	#tensor = torch.arange(1000, device=device) + 1 + 2 * rank
 	#print(tensor)
 	#print(tensor)
