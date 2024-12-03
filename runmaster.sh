@@ -2,8 +2,9 @@
 export NCCL_DEBUG=INFO
 #get default interface from 'ip route'
 export NCCL_SOCKET_IFNAME=bond0.2636
-export NCCL_NSOCS_PERTHREAD=32
+export NCCL_NSOCS_PERTHREAD=4
 export NCCL_SOCKET_NTHREADS=32
+export NCCL_IB_QPS_PER_CONNECTION=2
 ./.torch/bin/torchrun \
     --nproc_per_node=1 \
     --nnodes=2 \
