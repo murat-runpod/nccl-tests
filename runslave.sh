@@ -15,4 +15,4 @@ torchrun \
    main.py \
    --size 1000000000 \
    --iterations 20 \
-   --warmup 5 \
+   --warmup 5
