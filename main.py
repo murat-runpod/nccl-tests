@@ -24,6 +24,28 @@ def ddp_setup():
 def ddp_cleanup():
     dist.destroy_process_group()
 
+def analyze_profiler_events(prof):
+    """Analyze different types of events from the profiler."""
+    nccl_events = [event for event in prof.key_averages() if "nccl:all_reduce" in event.key]
+    c10d_events = [event for event in prof.key_averages() if "c10d:all_reduce" in event.key]
+    
+    events_info = []
+    if nccl_events:
+        events_info.append({
+            'name': 'NCCL all_reduce',
+            'times': [event.device_time / 1000 for event in nccl_events],  # Convert to ms
+            'self_times': [event.device_time_total / 1000 for event in nccl_events]  # Total time including child operations
+        })
+    
+    if c10d_events:
+        events_info.append({
+            'name': 'C10D all_reduce',
+            'times': [event.device_time / 1000 for event in c10d_events],
+            'self_times': [event.device_time_total / 1000 for event in c10d_events]
+        })
+    
+    return events_info
+
 def benchmark_communication(tensor_size, iterations, warmup):
     device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
     rank = int(os.environ["RANK"])
@@ -80,35 +102,28 @@ def benchmark_communication(tensor_size, iterations, warmup):
     # Print profiling results
     if rank == 0:
         print("\nProfiler Summary:")
-        print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
+        print(prof.key_averages().table(sort_by="device_time_total", row_limit=10))
         
-        # Extract timing information from profiler
-        all_reduce_events = [event for event in prof.key_averages() if "all_reduce" in event.key]
-        if not all_reduce_events:
-            print("Warning: No all_reduce events found in profiler output")
-            return
-            
-        # Verify we have the required attributes
-        if not hasattr(all_reduce_events[0], 'cuda_time'):
-            print("Available event attributes:", dir(all_reduce_events[0]))
-            raise AttributeError("Event object doesn't have cuda_time attribute")
-            
-        if all_reduce_events:
-            cuda_times = [event.cuda_time / 1000 for event in all_reduce_events]  # Convert to ms
-            size_gb = tensor.element_size() * tensor.nelement() / (1024**3)
-            bandwidths = [size_gb / (t / 1000) for t in cuda_times]  # Convert time to seconds for GB/s
-            
-            print("\nPerformance Statistics:")
-            print(f"Latency (ms):")
-            print(f"- Mean: {np.mean(cuda_times):.2f}")
-            print(f"- Std Dev: {np.std(cuda_times):.2f}")
-            print(f"- Min: {np.min(cuda_times):.2f}")
-            print(f"- Max: {np.max(cuda_times):.2f}")
-            print(f"\nBandwidth (GB/s):")
-            print(f"- Mean: {np.mean(bandwidths):.2f}")
-            print(f"- Std Dev: {np.std(bandwidths):.2f}")
-            print(f"- Min: {np.min(bandwidths):.2f}")
-            print(f"- Max: {np.max(bandwidths):.2f}")
+        # Analyze events
+        events_info = analyze_profiler_events(prof)
+        size_gb = tensor.element_size() * tensor.nelement() / (1024**3)
+        
+        for event_type in events_info:
+            times = event_type['times']
+            if times:  # Check if we have valid times
+                bandwidths = [size_gb / (t / 1000) if t > 0 else 0 for t in times]  # Convert time to seconds for GB/s
+                
+                print(f"\n{event_type['name']} Performance Statistics:")
+                print(f"Latency (ms):")
+                print(f"- Mean: {np.mean(times):.2f}")
+                print(f"- Std Dev: {np.std(times):.2f}")
+                print(f"- Min: {np.min(times):.2f}")
+                print(f"- Max: {np.max(times):.2f}")
+                print(f"\nBandwidth (GB/s):")
+                print(f"- Mean: {np.mean(bandwidths):.2f}")
+                print(f"- Std Dev: {np.std(bandwidths):.2f}")
+                print(f"- Min: {np.min(bandwidths):.2f}")
+                print(f"- Max: {np.max(bandwidths):.2f}")
 
 if __name__ == "__main__":
     args = parse_args()
