@@ -109,7 +109,7 @@ def benchmark_communication(tensor_size, iterations, warmup, enable_profiling=Fa
         bandwidths = np.array(bandwidths)
         
         print("\nPerformance Statistics:")
-		print(f"Size (GB): {size_gb:.2f}")
+		print(f"\nSize (GB): {size_gb:.2f}")
         print(f"\nLatency (ms):")
         print(f"- Mean: {np.mean(latencies):.2f}")
         print(f"- Std Dev: {np.std(latencies):.2f}")
