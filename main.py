@@ -84,8 +84,17 @@ def benchmark_communication(tensor_size, iterations, warmup):
         
         # Extract timing information from profiler
         all_reduce_events = [event for event in prof.key_averages() if "all_reduce" in event.key]
+        if not all_reduce_events:
+            print("Warning: No all_reduce events found in profiler output")
+            return
+            
+        # Verify we have the required attributes
+        if not hasattr(all_reduce_events[0], 'cuda_time'):
+            print("Available event attributes:", dir(all_reduce_events[0]))
+            raise AttributeError("Event object doesn't have cuda_time attribute")
+            
         if all_reduce_events:
-            cuda_times = [event.cuda_time_total / 1000 for event in all_reduce_events]  # Convert to ms
+            cuda_times = [event.cuda_time / 1000 for event in all_reduce_events]  # Convert to ms
             size_gb = tensor.element_size() * tensor.nelement() / (1024**3)
             bandwidths = [size_gb / (t / 1000) for t in cuda_times]  # Convert time to seconds for GB/s
             
