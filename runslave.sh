@@ -16,4 +16,3 @@ torchrun \
    --size 1000000000 \
    --iterations 20 \
    --warmup 5 \
-   --profile
