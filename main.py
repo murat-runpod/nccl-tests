@@ -21,6 +21,8 @@ if __name__ == "__main__":
 	print("global rank = " + str(rank))
 	print("device = " + torch.cuda.get_device_name(device))
 
+    dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+
 	with torch.profiler.profile() as prof:
 		tensor = torch.ones(5 * 10**9, device=device)
 		dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
