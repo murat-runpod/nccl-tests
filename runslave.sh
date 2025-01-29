@@ -12,7 +12,4 @@ torchrun \
     --rdzv_id=687 \
     --rdzv_backend=static \
     --rdzv_endpoint=$MASTER_ADDR:55000 \
-   main.py \
-   --size 1000000000 \
-   --iterations 20 \
-   --warmup 5
+   main.py
