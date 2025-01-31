@@ -9,7 +9,6 @@ torchrun \
     --nproc_per_node=1 \
     --nnodes=2 \
     --node_rank=0 \
-    --rdzv_id=687 \
-    --rdzv_backend=static \
-    --rdzv_endpoint=$MASTER_ADDR:55000 \
+    --master_addr=$MASTER_ADDR \
+    --master_port=55000 \
    main.py
