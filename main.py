@@ -7,7 +7,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 def ddp_setup():
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
-    dist.init_process_group(backend="nccl", init_method="env://")
+    dist.init_process_group(backend="nccl", init_method="env://", timeout=timedelta(seconds=10))
 
 def ddp_cleanup():
     dist.destroy_process_group()
