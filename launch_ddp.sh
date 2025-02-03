@@ -6,4 +6,4 @@ python3 -m torch.distributed.launch \
     --node_rank=$NODE_RANK \
     --master_addr=$MASTER_ADDR \
     --master_port=$MASTER_PORT \
-    main.py
+    ddp_main.py
