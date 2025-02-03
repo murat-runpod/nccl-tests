@@ -4,6 +4,7 @@ import torch.distributed as dist
 from torch.distributed import all_reduce
 from torch.profiler import profile, record_function, ProfilerActivity
 from torch.nn.parallel import DistributedDataParallel as DDP
+from datetime import timedelta
 
 def ddp_setup():
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
