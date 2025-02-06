@@ -6,3 +6,5 @@ torchrun \
     --master_addr=$MASTER_ADDR \
     --master_port=$MASTER_PORT \
    main.py
+
+   
